@@ -23,7 +23,7 @@ import * as Highcharts from 'highcharts/highstock';
 import HighchartsHeatmap from 'highcharts/modules/heatmap';
 import T from '../../lang';
 import * as ui from '../../ui';
-import { getHeatmapChartOptions } from './heatmap_utils';
+import { getHeatmapChartOptions } from '../../user/profile';
 
 HighchartsHeatmap(Highcharts);
 
