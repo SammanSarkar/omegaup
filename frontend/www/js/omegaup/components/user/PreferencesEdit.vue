@@ -127,6 +127,18 @@
         />{{ T.userEditHideProblemTags }}
       </label>
     </div>
+    <div class="form-group">
+      <label>
+        <input
+          v-model="darkMode"
+          type="checkbox"
+          :checked="darkMode"
+          data-dark-mode
+          class="mr-2"
+          @change="handleDarkModeChange"
+        />Dark Mode
+      </label>
+    </div>
     <div class="mt-3">
       <button
         type="submit"
@@ -156,6 +168,13 @@ import { ButtonPlugin, PopoverPlugin } from 'bootstrap-vue';
 Vue.use(ButtonPlugin);
 Vue.use(PopoverPlugin);
 
+// Extend window for TypeScript
+declare global {
+  interface Window {
+    toggleOmegaUpDarkTheme?: (isDark: boolean) => void;
+  }
+}
+
 @Component({
   components: {
     FontAwesomeIcon,
@@ -165,6 +184,7 @@ export default class UserPreferencesEdit extends Vue {
   @Prop() profile!: types.UserProfileInfo;
 
   show: boolean = false;
+  darkMode: boolean = false;
   T = T;
   ObjectivesAnswers = ObjectivesAnswers;
   email = this.profile.email;
@@ -261,6 +281,37 @@ export default class UserPreferencesEdit extends Vue {
     }
   }
 
+  created() {
+    // Load dark mode preference from localStorage
+    this.darkMode = localStorage.getItem('omegaup_dark_mode') === 'true';
+  }
+
+  mounted() {
+    // Apply theme on mount
+    this.applyTheme();
+  }
+
+  handleDarkModeChange() {
+    // Use the global function to toggle dark mode
+    if (window.toggleOmegaUpDarkTheme) {
+      window.toggleOmegaUpDarkTheme(this.darkMode);
+    } else {
+      // Fallback if the global function isn't available
+      localStorage.setItem('omegaup_dark_mode', this.darkMode.toString());
+      this.applyTheme();
+    }
+  }
+
+  applyTheme() {
+    if (this.darkMode) {
+      document.documentElement.classList.add('dark-theme');
+      document.body.classList.add('dark-theme');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  }
+
   onUpdateUserPreferences(): void {
     this.$emit('update-user-preferences', {
       userPreferences: {
@@ -272,9 +323,14 @@ export default class UserPreferencesEdit extends Vue {
         has_learning_objective: this.hasLearningObjective,
         has_scholar_objective: this.hasScholarObjective,
         has_teaching_objective: this.hasTeachingObjective,
+        // We'll add this to the backend later
+        // theme_preference: this.darkMode ? 'dark' : 'light',
       },
       localeChanged: this.locale != this.profile.locale,
     });
+    
+    // Save dark mode to localStorage
+    localStorage.setItem('omegaup_dark_mode', this.darkMode.toString());
   }
 
   handlePrivateProfileCheckboxChange(): void {
