@@ -16,6 +16,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
         'user_id' => true,
         'status' => true,
         'error_message' => true,
+        'is_retriable' => true,
         'attempts' => true,
         'created_at' => true,
         'md_en' => true,
@@ -52,6 +53,9 @@ class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
             ) ? null : strval(
                 $data['error_message']
             );
+        }
+        if (isset($data['is_retriable'])) {
+            $this->is_retriable = boolval($data['is_retriable']);
         }
         if (isset($data['attempts'])) {
             $this->attempts = intval($data['attempts']);
@@ -129,6 +133,12 @@ class AiEditorialJobs extends \OmegaUp\DAO\VO\VO {
      * @var string|null
      */
     public $error_message = null;
+
+    /**
+     * Indica si el error permite reintentos
+     * @var bool|null
+     */
+    public $is_retriable = true;
 
     /**
      * Número de intentos de procesamiento

@@ -50,7 +50,8 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
     public static function updateJobStatus(
         string $jobId,
         string $status,
-        ?string $errorMessage = null
+        ?string $errorMessage = null,
+        ?bool $isRetriable = null
     ): void {
         $job = self::getByPK($jobId);
         if (is_null($job)) {
@@ -60,6 +61,9 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
         $job->status = $status;
         if (!is_null($errorMessage)) {
             $job->error_message = $errorMessage;
+        }
+        if (!is_null($isRetriable)) {
+            $job->is_retriable = $isRetriable;
         }
 
         self::save($job);
@@ -136,7 +140,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             LIMIT 1
         ';
 
-        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
+        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetRow(
             $sql,
             [$problemId]
@@ -168,7 +172,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             LIMIT ?
         ';
 
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$userId, $limit]
@@ -198,7 +202,7 @@ class AiEditorialJobs extends \OmegaUp\DAO\Base\AiEditorialJobs {
             ORDER BY created_at DESC
         ';
 
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $rs = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             [$problemId]

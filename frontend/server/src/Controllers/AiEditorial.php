@@ -5,7 +5,7 @@ namespace OmegaUp\Controllers;
 /**
  * AI Editorial Controller
  *
- * @psalm-type AiEditorialJobDetails=array{job_id: string, status: string, error_message: null|string, created_at: \OmegaUp\Timestamp, problem_alias: string, md_en: null|string, md_es: null|string, md_pt: null|string}
+ * @psalm-type AiEditorialJobDetails=array{job_id: string, status: string, error_message: null|string, is_retriable: bool, created_at: \OmegaUp\Timestamp, problem_alias: string, md_en: null|string, md_es: null|string, md_pt: null|string}
  */
 class AiEditorial extends \OmegaUp\Controllers\Controller {
     const STATUS_QUEUED = 'queued';
@@ -130,6 +130,7 @@ class AiEditorial extends \OmegaUp\Controllers\Controller {
                 'job_id' => strval($job->job_id),
                 'status' => strval($job->status),
                 'error_message' => $job->error_message,
+                'is_retriable' => boolval($job->is_retriable),
                 'created_at' => $job->created_at,
                 'problem_alias' => strval($problem->alias),
                 'md_en' => $job->md_en,

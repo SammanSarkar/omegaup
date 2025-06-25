@@ -56,6 +56,7 @@ abstract class AiEditorialJobs {
                 `user_id` = ?,
                 `status` = ?,
                 `error_message` = ?,
+                `is_retriable` = ?,
                 `attempts` = ?,
                 `md_en` = ?,
                 `md_es` = ?,
@@ -68,6 +69,7 @@ abstract class AiEditorialJobs {
             $AI_Editorial_Jobs->user_id,
             $AI_Editorial_Jobs->status,
             $AI_Editorial_Jobs->error_message,
+            $AI_Editorial_Jobs->is_retriable ? 1 : 0,
             $AI_Editorial_Jobs->attempts,
             $AI_Editorial_Jobs->md_en,
             $AI_Editorial_Jobs->md_es,
@@ -97,6 +99,7 @@ abstract class AiEditorialJobs {
                 `AI_Editorial_Jobs`.`user_id`,
                 `AI_Editorial_Jobs`.`status`,
                 `AI_Editorial_Jobs`.`error_message`,
+                `AI_Editorial_Jobs`.`is_retriable`,
                 `AI_Editorial_Jobs`.`attempts`,
                 `AI_Editorial_Jobs`.`created_at`,
                 `AI_Editorial_Jobs`.`md_en`,
@@ -109,7 +112,7 @@ abstract class AiEditorialJobs {
                 `AI_Editorial_Jobs`.`job_id` = ?
             LIMIT 1;';
         $params = [$job_id];
-        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
+        /** @var array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}|null */
         $row = \OmegaUp\MySQLConnection::getInstance()->GetRow($sql, $params);
         if (empty($row)) {
             return null;
@@ -137,6 +140,7 @@ abstract class AiEditorialJobs {
                 `user_id`,
                 `status`,
                 `error_message`,
+                `is_retriable`,
                 `attempts`,
                 `created_at`,
                 `md_en`,
@@ -144,6 +148,7 @@ abstract class AiEditorialJobs {
                 `md_pt`,
                 `validation_verdict`
             ) VALUES (
+                ?,
                 ?,
                 ?,
                 ?,
@@ -162,6 +167,7 @@ abstract class AiEditorialJobs {
             $AI_Editorial_Jobs->user_id,
             $AI_Editorial_Jobs->status,
             $AI_Editorial_Jobs->error_message,
+            $AI_Editorial_Jobs->is_retriable ? 1 : 0,
             $AI_Editorial_Jobs->attempts,
             \OmegaUp\DAO\DAO::toMySQLTimestamp($AI_Editorial_Jobs->created_at),
             $AI_Editorial_Jobs->md_en,
@@ -219,6 +225,10 @@ abstract class AiEditorialJobs {
             $clauses[] = '`AI_Editorial_Jobs`.`error_message` = ?';
             $params[] = $AI_Editorial_Jobs->error_message;
         }
+        if (!is_null($AI_Editorial_Jobs->is_retriable)) {
+            $clauses[] = '`AI_Editorial_Jobs`.`is_retriable` = ?';
+            $params[] = $AI_Editorial_Jobs->is_retriable ? 1 : 0;
+        }
         if (!is_null($AI_Editorial_Jobs->attempts)) {
             $clauses[] = '`AI_Editorial_Jobs`.`attempts` = ?';
             $params[] = $AI_Editorial_Jobs->attempts;
@@ -251,6 +261,7 @@ abstract class AiEditorialJobs {
                 `AI_Editorial_Jobs`.`user_id`,
                 `AI_Editorial_Jobs`.`status`,
                 `AI_Editorial_Jobs`.`error_message`,
+                `AI_Editorial_Jobs`.`is_retriable`,
                 `AI_Editorial_Jobs`.`attempts`,
                 `AI_Editorial_Jobs`.`created_at`,
                 `AI_Editorial_Jobs`.`md_en`,
@@ -260,7 +271,7 @@ abstract class AiEditorialJobs {
             FROM
                 `AI_Editorial_Jobs`
             {$whereClause};";
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll(
             $sql,
             $params
@@ -320,6 +331,7 @@ abstract class AiEditorialJobs {
                 `AI_Editorial_Jobs`.`user_id`,
                 `AI_Editorial_Jobs`.`status`,
                 `AI_Editorial_Jobs`.`error_message`,
+                `AI_Editorial_Jobs`.`is_retriable`,
                 `AI_Editorial_Jobs`.`attempts`,
                 `AI_Editorial_Jobs`.`created_at`,
                 `AI_Editorial_Jobs`.`md_en`,
@@ -341,7 +353,7 @@ abstract class AiEditorialJobs {
                 $filasPorPagina
             );
         }
-        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
+        /** @var list<array{attempts: int, created_at: \OmegaUp\Timestamp, error_message: null|string, is_retriable: int, job_id: string, md_en: null|string, md_es: null|string, md_pt: null|string, problem_id: int, status: string, user_id: int, validation_verdict: null|string}> */
         $allData = \OmegaUp\MySQLConnection::getInstance()->GetAll($sql);
         $allObjects = [];
         foreach ($allData as $row) {
